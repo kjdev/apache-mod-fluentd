@@ -151,7 +151,16 @@ fluentd_writer(request_rec *r, void *handle, const char **strs, int *strl,
             memcpy(s, strs[i], strl[i]);
             s += strl[i];
         }
-        str[len] = '\0';
+
+        if (str[len-1] == '\n') {
+            if (str[len-2] == '\r') {
+                str[len-2] = '\0';
+            } else {
+                str[len-1] = '\0';
+            }
+        } else {
+            str[len] = '\0';
+        }
 
         _DEBUG(r->pool, "fluentd: tag = %s, host = %s, port = %d",
                fluentd->tag, fluentd->host, fluentd->port);
