@@ -84,7 +84,7 @@ fluentd_writer_init(apr_pool_t *p, server_rec *s, const char * name)
         char *format = apr_pstrdup(p, name);
         char *host = DEFAULT_FLUENTD_HOST;
         char *c = NULL, *tag = NULL, *extend = NULL;
-        int i, port = DEFAULT_FLUENTD_PORT;
+        int i = 0, port = DEFAULT_FLUENTD_PORT;
         fluentd_handle_t *handle;
 
         tag = format + PREFIX_FLUENTD_LENGTH;
@@ -100,13 +100,14 @@ fluentd_writer_init(apr_pool_t *p, server_rec *s, const char * name)
             }
         }
 
-        if ((c = strchr(format, ' ')) != NULL) {
+        if ((c = strchr(format + i, ' ')) != NULL) {
             i = c - format;
             format[i++] = '\0';
             extend = format + i;
         }
 
-        _DEBUG(p, "fluentd: tag = %s, host = %s, port = %d", tag, host, port);
+        _DEBUG(p, "fluentd: tag = %s, host = %s, port = %d, extend = %s",
+               tag, host, port, extend);
 
         handle = (fluentd_handle_t *)apr_palloc(p, sizeof(fluentd_handle_t));
 
