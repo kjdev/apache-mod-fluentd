@@ -174,19 +174,20 @@ fluentd_writer(request_rec *r, void *handle, const char **strs, int *strl,
             json_error_t error;
 
             data = json_loads(fluentd->extend, 0, &error);
-            if (data && json_is_object(data)) {
-                const char *key;
-                json_t *value;
-                void *iter = json_object_iter(data);
-                while (iter) {
-                    key = json_object_iter_key(iter);
-                    value = json_object_iter_value(iter);
+            if (data) {
+                if (json_is_object(data)) {
+                    const char *key;
+                    json_t *value;
+                    void *iter = json_object_iter(data);
+                    while (iter) {
+                        key = json_object_iter_key(iter);
+                        value = json_object_iter_value(iter);
 
-                    json_object_set_new(msg, key, value);
+                        json_object_set_new(msg, key, json_copy(value));
 
-                    iter = json_object_iter_next(data, iter);
+                        iter = json_object_iter_next(data, iter);
+                    }
                 }
-            } else {
                 json_delete(data);
             }
         }
